@@ -1,0 +1,43 @@
+{
+  "name": "tmonfre-cs61-lab3-server-side",
+  "version": "1.0.0",
+  "description": "Lab 3 Web API",
+  "author": "Thomas Monfre, Dartmouth CS 61, Spring 2020",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "babel-node src/server.js",
+    "dev": "nodemon src/server.js --exec babel-node"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^5.12.1",
+    "eslint-config-airbnb": "^17.1.0",
+    "nodemon": "^2.0.2"
+  },
+  "dependencies": {
+    "@babel/core": "^7.0.0",
+    "axios": "^0.19.2",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^8.0.4",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "bcrypt-nodejs": "^0.0.3",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.0",
+    "express": "^4.17.1",
+    "fs-es6": "0.0.2",
+    "jwt-simple": "^0.5.6",
+    "morgan": "^1.10.0",
+    "mysql": "^2.17.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "webpack": "^4.29.0"
+  }
+}
