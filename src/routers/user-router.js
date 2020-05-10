@@ -28,30 +28,6 @@ router.route('/')
 				response: RESPONSE_CODES.FORBIDDEN.message,
 			});
 		}
-	})
-	// CREATE new user
-	.post((req, res) => {
-		// ensure admin user is calling this route
-		if (req.user.AdminUser) {
-			// create user
-			userController.createUser(req.body)
-				.then((response) => {
-					res.send({ status: 200, error: null, response });
-				})
-				.catch((error) => {
-					res.status(error.code.status).send({
-						status: error.code.status,
-						error: error.error,
-						response: error.code.message,
-					});
-				});
-		} else {
-			res.status(RESPONSE_CODES.FORBIDDEN.status).send({
-				status: RESPONSE_CODES.FORBIDDEN.status,
-				error: 'Not authorized for this function',
-				response: RESPONSE_CODES.FORBIDDEN.message,
-			});
-		}
 	});
 
 router.route('/:id')
