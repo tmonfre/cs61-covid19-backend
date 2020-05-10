@@ -1,5 +1,5 @@
 import express from 'express';
-import { isAuthedUser, tokenForUser } from '../controller';
+import { isAuthedUser, tokenForUser } from '../controllers/user-controller';
 import { RESPONSE_CODES, extractCredentialsFromAuthorization } from '../constants';
 
 const router = express();

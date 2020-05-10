@@ -1,29 +1,33 @@
 import bcrypt from 'bcrypt-nodejs';
 import jwt from 'jwt-simple';
-import { RESPONSE_CODES } from './constants';
+import { RESPONSE_CODES } from '../constants';
 
 const { SALT_ROUNDS } = process.env;
 
-// get all employees in the database
-const getAllEmployees = () => {
+// get all users in the database
+const getAllUsers = () => {
 	return new Promise((resolve, reject) => {
-		// get all employees
-		global.connection.query('SELECT * FROM nyc_inspections.Employees', (error, results, fields) => {
+		// get all users
+		global.connection.query('SELECT * FROM COVID19_sp20.Users', (error, results, fields) => {
 			if (error) {
 				reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
 			} else {
+				results.forEach((user) => {
+					user.AdminUser = user.AdminUser === 1;
+				});
+
 				resolve(results);
 			}
 		});
 	});
 };
 
-// get a specific employee by username in the database
-const getEmployeeByUserName = (username) => {
+// get a specific user by username in the database
+const getUser = (username) => {
 	return new Promise((resolve, reject) => {
-		// get employee
+		// get user
 		global.connection.query(
-			'SELECT * FROM nyc_inspections.Employees WHERE UserName = ?',
+			'SELECT * FROM COVID19_sp20.Users WHERE UserName = ?',
 			[username],
 			(error, results, fields) => {
 				// send appropriate response
@@ -32,6 +36,7 @@ const getEmployeeByUserName = (username) => {
 				} else if (results.length === 0) {
 					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
 				} else {
+					results[0].AdminUser = results[0].AdminUser === 1;
 					resolve(results[0]);
 				}
 			},
@@ -39,8 +44,8 @@ const getEmployeeByUserName = (username) => {
 	});
 };
 
-// create employee in the database
-const createEmployee = (fields) => {
+// create user in the database
+const createUser = (fields) => {
 	return new Promise((resolve, reject) => {
 		// ensure got required inputs
 		if (!(fields.FirstName && fields.UserName && fields.Password)) {
@@ -59,17 +64,16 @@ const createEmployee = (fields) => {
 					fields.UserName,
 					fields.FirstName,
 					fields.LastName || null,
-					fields.Salary || null,
-					fields.HireDate ? new Date(fields.HireDate).toISOString().split('T')[0] : null,
+					fields.AccountCreated ? new Date(fields.AccountCreated).toISOString().split('T')[0] : null,
 					fields.AdminUser || false,
 					hash,
 				];
 
-				// create employee
+				// create user
 				global.connection.query(
-					'INSERT INTO nyc_inspections.Employees'
-                    + '(UserName, FirstName, LastName, Salary, HireDate, AdminUser, SaltedPassword) VALUES'
-                    + '(?, ?, ?, ?, ?, ?, ?)',
+					'INSERT INTO COVID19_sp20.Users'
+                    + '(UserName, FirstName, LastName, AccountCreated, AdminUser, SaltedPassword) VALUES'
+                    + '(?, ?, ?, ?, ?, ?)',
 					userValues,
 					(error, results) => {
 						// send appropriate response
@@ -85,18 +89,17 @@ const createEmployee = (fields) => {
 	});
 };
 
-// update the employee object in the database
+// update the user object in the database
 // admin users calling this function can alter more fields
-const updateEmployee = (username, fields, isAdmin) => {
+const updateUser = (username, fields, isAdmin) => {
 	return new Promise((resolve, reject) => {
 		// define the possible attributes the user could have supplied
 		const possibleAttributes = ['FirstName', 'LastName'];
 
-		// only admin user calling the function can change the AdminUser, Salary, and HireDate fields
+		// only admin user calling the function can change the AdminUser and AccountCreated fields
 		if (isAdmin) {
 			possibleAttributes.push('AdminUser');
-			possibleAttributes.push('Salary');
-			possibleAttributes.push('HireDate');
+			possibleAttributes.push('AccountCreated');
 		}
 
 		// create lists for valid keys and values user could provide
@@ -108,7 +111,7 @@ const updateEmployee = (username, fields, isAdmin) => {
 			if (Object.keys(fields).includes(attribute)) {
 				queryKeys.push(attribute);
 
-				if (attribute === 'HireDate') {
+				if (attribute === 'AccountCreated') {
 					queryValues.push(new Date(fields[attribute]).toISOString().split('T')[0]);
 				} else {
 					queryValues.push(fields[attribute]);
@@ -119,9 +122,9 @@ const updateEmployee = (username, fields, isAdmin) => {
 		queryValues.push(username);
 
 		if (queryKeys.length > 0) {
-			// update employee
+			// update user
 			global.connection.query(
-				`UPDATE nyc_inspections.Employees SET ${
+				`UPDATE COVID19_sp20.Users SET ${
 					queryKeys.map((attribute) => {
 						return `${attribute} = ?`;
 					})
@@ -142,12 +145,12 @@ const updateEmployee = (username, fields, isAdmin) => {
 	});
 };
 
-// delete the employee object from the database
-const deleteEmployee = (UserName) => {
+// delete the user object from the database
+const deleteUser = (UserName) => {
 	return new Promise((resolve, reject) => {
-		// delete employee
+		// delete user
 		global.connection.query(
-			'DELETE FROM nyc_inspections.Employees WHERE UserName = ?',
+			'DELETE FROM COVID19_sp20.Users WHERE UserName = ?',
 			[UserName],
 			(error, results, fields) => {
 				// send appropriate response
@@ -167,10 +170,10 @@ const deleteEmployee = (UserName) => {
 // hash and salt the username and password, make sure matches stored hash
 const isAuthedUser = (credentials) => {
 	return new Promise((resolve, reject) => {
-		getEmployeeByUserName(credentials.username)
-			.then((employee) => {
-				if (employee.SaltedPassword) {
-					bcrypt.compare(credentials.password, employee.SaltedPassword, (err, result) => {
+		getUser(credentials.username)
+			.then((user) => {
+				if (user.SaltedPassword) {
+					bcrypt.compare(credentials.password, user.SaltedPassword, (err, result) => {
 						if (err) {
 							reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error: err });
 						} else {
@@ -200,11 +203,11 @@ const tokenForUser = (username) => {
 };
 
 export {
-	getAllEmployees,
-	getEmployeeByUserName,
-	createEmployee,
-	updateEmployee,
-	deleteEmployee,
+	getAllUsers,
+	getUser,
+	createUser,
+	updateUser,
+	deleteUser,
 	isAuthedUser,
 	tokenForUser,
 };
