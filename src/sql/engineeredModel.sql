@@ -14,7 +14,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema COVID19_sp20
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `COVID19_sp20` DEFAULT CHARACTER SET latin1 ;
+CREATE SCHEMA IF NOT EXISTS `COVID19_sp20` DEFAULT CHARACTER SET utf8 ;
 USE `COVID19_sp20` ;
 
 -- -----------------------------------------------------
