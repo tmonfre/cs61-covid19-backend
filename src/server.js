@@ -1,19 +1,14 @@
-// Database Systems (CS 61) Spring 2020
-// Lab 3 -- Web Server
-// Thomas Monfre
-// April 27, 2020
-
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import morgan from 'morgan';
 import mysql from 'mysql';
 
-import router from './router';
-import authRouter from './authentication/auth-router';
+import userRouter from './routers/user-router';
+import authRouter from './routers/auth-router';
 import requireAuth from './authentication/require-auth';
 
-import createInitialAdminUser from './constants/initial-user';
+// import createInitialAdminUser from './constants/initial-user';
 
 require('dotenv').config();
 
@@ -53,7 +48,7 @@ app.use((req, res, next) => {
 });
 
 // attach routers
-app.use('/api/employees', requireAuth, router);
+app.use('/api/users', requireAuth, userRouter);
 app.use('/api/authentication', authRouter);
 
 // start listening

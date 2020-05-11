@@ -1,8 +1,8 @@
 {
-  "name": "tmonfre-cs61-lab3-server-side",
+  "name": "cs61-covid19-backend",
   "version": "1.0.0",
-  "description": "Lab 3 Web API",
-  "author": "Thomas Monfre, Dartmouth CS 61, Spring 2020",
+  "description": "COVID-19 Data Visualization Web Server",
+  "author": "Anne Bailey, Rohith Mandavilli, Thomas Monfre, Emma Rafkin",
   "main": "src/server.js",
   "scripts": {
     "start": "babel-node src/server.js",
@@ -26,6 +26,7 @@
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "csvtojson": "^2.0.10",
     "dotenv": "^8.2.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
@@ -38,6 +39,7 @@
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "request": "^2.88.2",
     "webpack": "^4.29.0"
   }
 }

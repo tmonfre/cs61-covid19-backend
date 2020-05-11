@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import { getEmployeeByUserName } from '../controller';
+import { getUser } from '../controllers/user-controller';
 
 require('dotenv').config();
 
@@ -11,7 +11,7 @@ const jwtOptions = {
 
 const jwtLogin = new JwtStrategy(jwtOptions, (payload, done) => {
 	// make sure token matches a user in the database
-	getEmployeeByUserName(payload.sub)
+	getUser(payload.sub)
 		.then((user) => {
 			if (user) {
 				return done(null, user);

@@ -1,6 +1,6 @@
 import express from 'express';
-import * as controller from './controller';
-import { RESPONSE_CODES } from './constants';
+import * as userController from '../controllers/user-controller';
+import { RESPONSE_CODES } from '../constants';
 
 const router = express();
 
@@ -9,32 +9,8 @@ router.route('/')
 	.get((req, res) => {
 		// ensure admin user is calling this route
 		if (req.user.AdminUser) {
-			// grab all employees from controller
-			controller.getAllEmployees()
-				.then((response) => {
-					res.send({ status: 200, error: null, response });
-				})
-				.catch((error) => {
-					res.status(error.code.status).send({
-						status: error.code.status,
-						error: error.error,
-						response: error.code.message,
-					});
-				});
-		} else {
-			res.status(RESPONSE_CODES.FORBIDDEN.status).send({
-				status: RESPONSE_CODES.FORBIDDEN.status,
-				error: 'Not authorized for this function',
-				response: RESPONSE_CODES.FORBIDDEN.message,
-			});
-		}
-	})
-	// CREATE new user
-	.post((req, res) => {
-		// ensure admin user is calling this route
-		if (req.user.AdminUser) {
-			// create employee
-			controller.createEmployee(req.body)
+			// grab all users from controller
+			userController.getAllUsers()
 				.then((response) => {
 					res.send({ status: 200, error: null, response });
 				})
@@ -59,8 +35,8 @@ router.route('/:id')
 	.get((req, res) => {
 		// ensure admin user is calling this route OR authed user is requesting themselves
 		if (req.user.AdminUser || req.user.UserName === req.params.id) {
-			// grab the employee data
-			controller.getEmployeeByUserName(req.params.id)
+			// grab the user data
+			userController.getUser(req.params.id)
 				.then((response) => {
 					// don't show salted password to user
 					if (response.SaltedPassword) {
@@ -88,8 +64,8 @@ router.route('/:id')
 	.put((req, res) => {
 		// ensure admin user is calling this route OR authed user is requesting themselves
 		if (req.user.AdminUser || req.user.UserName === req.params.id) {
-			// update employee
-			controller.updateEmployee(req.params.id, req.body, req.user.AdminUser)
+			// update user
+			userController.updateUser(req.params.id, req.body, req.user.AdminUser)
 				.then((response) => {
 					res.send({ status: 200, error: null, response });
 				})
@@ -112,8 +88,8 @@ router.route('/:id')
 	.delete((req, res) => {
 		// ensure admin user is calling this route
 		if (req.user.AdminUser) {
-			// delete employee
-			controller.deleteEmployee(req.params.id)
+			// delete user
+			userController.deleteUser(req.params.id)
 				.then((response) => {
 					res.send({ status: 200, error: null, response });
 				})

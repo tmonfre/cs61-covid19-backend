@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { createEmployee } from '../controller';
+import { createUser } from '../controllers/user-controller';
 
 const createInitialAdminUser = (app) => {
 	// define route for initially creating admin employee
@@ -7,7 +7,7 @@ const createInitialAdminUser = (app) => {
 	// admin to login as on the frontend
 	app.post('/initial-admin', (req, res) => {
 	// create employee with dummy values
-		createEmployee(req.body)
+		createUser(req.body)
 			.then((response) => {
 				res.send({ status: 200, error: null, response });
 			})
@@ -22,17 +22,16 @@ const createInitialAdminUser = (app) => {
 
 	// make request
 	axios.post('http://localhost:3000/initial-admin', {
-		FirstName: 'Admin',
-		LastName: 'User',
-		Salary: 100000,
-		HireDate: '04-17-2020',
-		UserName: 'adminuser',
-		Password: 'mypassword',
+		FirstName: 'Thomas',
+		LastName: 'Monfre',
+		AccountCreated: new Date().toISOString().split('T')[0],
+		UserName: 'tmonfre',
+		Password: 'password',
 		AdminUser: true,
 	})
 		.then((result) => {
 			console.log('SUCCESSFULLY CREATED INITIAL ADMIN USER');
-			console.log('CAN NOW LOGIN WITH USERNAME: adminuser');
+			console.log('CAN NOW LOGIN WITH USERNAME: tmonfre');
 			console.log(result.data);
 		})
 		.catch((error) => {
