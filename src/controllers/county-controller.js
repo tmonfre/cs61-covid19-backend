@@ -35,14 +35,35 @@ const getCounty = (countyID) => {
 	});
 };
 
+// get a specific county by county name and state name in the database
+const getCountyByNameAndState = (countyName, stateName) => {
+	return new Promise((resolve, reject) => {
+		// get user
+		global.connection.query(
+			'SELECT * FROM COVID19_sp20.Counties WHERE CountyName AND StateName = ?',
+			[countyName, stateName],
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results[0]);
+				}
+			},
+		);
+	});
+};
+
 // create county in the database
 const createCounty = (fields) => {
 	return new Promise((resolve, reject) => {
 		// ensure got required inputs
-		if (!(fields.CountyName && fields.StateName && fields.Population && fields.FIPS)) {
+		if (!(fields.CountyName && fields.StateName && fields.Population)) {
 			reject({
 				code: RESPONSE_CODES.BAD_REQUEST,
-				error: { message: 'Please provide CountyName, StateName, Population, and FIPS' },
+				error: { message: 'Please provide CountyName, StateName, and Population' },
 			});
 		}
 
@@ -92,9 +113,30 @@ const deleteCounty = (countyID) => {
 	});
 };
 
+const deleteAllCounties = () => {
+	return new Promise((resolve, reject) => {
+		// delete all counties
+		global.connection.query(
+			'CALL TruncateCounties()',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+
 export {
 	getAllCounties,
 	getCounty,
+	getCountyByNameAndState,
 	createCounty,
 	deleteCounty,
+	deleteAllCounties,
 };

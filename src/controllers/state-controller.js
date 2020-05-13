@@ -93,9 +93,29 @@ const deleteState = (stateName) => {
 	});
 };
 
+const deleteAllStates = () => {
+	return new Promise((resolve, reject) => {
+		// delete all counties
+		global.connection.query(
+			'',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+
 export {
 	getAllStates,
 	getState,
 	createState,
 	deleteState,
+	deleteAllStates,
 };

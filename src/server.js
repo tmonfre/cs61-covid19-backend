@@ -6,7 +6,11 @@ import mysql from 'mysql';
 
 import userRouter from './routers/user-router';
 import authRouter from './routers/auth-router';
+import stateRouter from './routers/state-router';
+import countyRouter from './routers/county-router';
+
 import requireAuth from './authentication/require-auth';
+import initializeScheduler from './services/schedule-update';
 
 // import createInitialAdminUser from './constants/initial-user';
 
@@ -47,14 +51,28 @@ app.use((req, res, next) => {
 	next();
 });
 
+// create global database connection
+global.connection = mysql.createConnection({
+	host: process.env.HOST,
+	user: process.env.USERNAME,
+	password: process.env.PASSWORD,
+	database: process.env.SCHEMA,
+});
+global.connection.connect();
+
 // attach routers
 app.use('/api/users', requireAuth, userRouter);
 app.use('/api/authentication', authRouter);
+app.use('/api/states', stateRouter);
+app.use('/api/counties', countyRouter);
 
 // start listening
 app.listen(process.env.PORT, () => {
 	console.log(`Listening on port ${process.env.PORT}`);
 });
+
+// set the database to update case counts every day
+initializeScheduler();
 
 // NOTE FOR GRADERS:
 // uncomment the below function call to create

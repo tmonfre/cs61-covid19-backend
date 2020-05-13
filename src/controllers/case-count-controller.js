@@ -77,7 +77,7 @@ const createCaseCount = (fields) => {
 
 		// create user
 		global.connection.query(
-			'INSERT INTO COVID19_sp20.Counties'
+			'INSERT INTO COVID19_sp20.CaseCount'
             + '(CountyID, StateName, Date, CaseCount, DeathCount) VALUES'
             + '(?, ?, ?, ?, ?)',
 			stateValues,
@@ -176,6 +176,25 @@ const deleteCaseCount = (countyID, date) => {
 	});
 };
 
+const deleteAllCaseCounts = () => {
+	return new Promise((resolve, reject) => {
+		// delete all counties
+		global.connection.query(
+			'CALL TruncateCaseCounts()',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+
 export {
 	getAllCaseCounts,
 	getCountyCaseCount,
@@ -183,4 +202,5 @@ export {
 	deleteCaseCount,
 	updateCaseCount,
 	createCaseCount,
+	deleteAllCaseCounts,
 };
