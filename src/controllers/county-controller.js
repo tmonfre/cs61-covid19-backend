@@ -60,35 +60,37 @@ const getCountyByNameAndState = (countyName, stateName) => {
 const createCounty = (fields) => {
 	return new Promise((resolve, reject) => {
 		// ensure got required inputs
-		if (!(fields.CountyName && fields.StateName && fields.Population)) {
+		if (!Object.keys(fields).includes('CountyName')
+		|| !Object.keys(fields).includes('StateName')
+		|| !Object.keys(fields).includes('Population')) {
 			reject({
 				code: RESPONSE_CODES.BAD_REQUEST,
 				error: { message: 'Please provide CountyName, StateName, and Population' },
 			});
+		} else {
+			const stateValues = [
+				fields.CountyName,
+				fields.StateName,
+				fields.Population,
+				fields.FIPS || null,
+			];
+
+			// create user
+			global.connection.query(
+				'INSERT INTO COVID19_sp20.Counties'
+				+ '(CountyName, StateName, Population, FIPS) VALUES'
+				+ '(?, ?, ?, ?)',
+				stateValues,
+				(error, results) => {
+					// send appropriate response
+					if (error) {
+						reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+					} else {
+						resolve(results);
+					}
+				},
+			);
 		}
-
-		const stateValues = [
-			fields.CountyName,
-			fields.StateName,
-			fields.Population,
-			fields.FIPS || null,
-		];
-
-		// create user
-		global.connection.query(
-			'INSERT INTO COVID19_sp20.Counties'
-            + '(CountyName, StateName, Population, FIPS) VALUES'
-            + '(?, ?, ?, ?)',
-			stateValues,
-			(error, results) => {
-				// send appropriate response
-				if (error) {
-					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
-				} else {
-					resolve(results);
-				}
-			},
-		);
 	});
 };
 

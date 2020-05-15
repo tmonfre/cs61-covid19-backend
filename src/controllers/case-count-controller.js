@@ -14,6 +14,20 @@ const getAllCaseCounts = () => {
 	});
 };
 
+// get all case counts in the database
+const getAllCaseCountsWithCountyName = () => {
+	return new Promise((resolve, reject) => {
+		// get all users
+		global.connection.query('SELECT cc.*, c.CountyName FROM COVID19_sp20.CaseCount cc LEFT JOIN COVID19_sp20.Counties c ON cc.CountyID = c.countyID ', (error, results, fields) => {
+			if (error) {
+				reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+			} else {
+				resolve(results);
+			}
+		});
+	});
+};
+
 // get a specific case count by countyID in the database
 const getCountyCaseCount = (countyID) => {
 	return new Promise((resolve, reject) => {
@@ -197,6 +211,7 @@ const deleteAllCaseCounts = () => {
 
 export {
 	getAllCaseCounts,
+	getAllCaseCountsWithCountyName,
 	getCountyCaseCount,
 	getStateCaseCount,
 	deleteCaseCount,

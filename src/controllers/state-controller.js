@@ -39,36 +39,38 @@ const getState = (name) => {
 const createState = (fields) => {
 	return new Promise((resolve, reject) => {
 		// ensure got required inputs
-		if (!(fields.StateName && fields.Population && fields.FIPS)) {
+		if (!Object.keys(fields).includes('StateName')
+		|| !Object.keys(fields).includes('Population')
+		|| !Object.keys(fields).includes('FIPS')) {
 			reject({
 				code: RESPONSE_CODES.BAD_REQUEST,
 				error: { message: 'Please provide StateName, Population, and FIPS' },
 			});
+		} else {
+			const stateValues = [
+				fields.StateName,
+				fields.Population,
+				fields.FIPS,
+				fields.FirstCase || null,
+				fields.FirstDeath || null,
+			];
+
+			// create user
+			global.connection.query(
+				'INSERT INTO COVID19_sp20.States'
+				+ '(StateName, Population, FIPS, FirstCase, FirstDeath) VALUES'
+				+ '(?, ?, ?, ?, ?)',
+				stateValues,
+				(error, results) => {
+					// send appropriate response
+					if (error) {
+						reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+					} else {
+						resolve(results);
+					}
+				},
+			);
 		}
-
-		const stateValues = [
-			fields.StateName,
-			fields.Population,
-			fields.FIPS,
-			fields.FirstCase || null,
-			fields.FirstDeath || null,
-		];
-
-		// create user
-		global.connection.query(
-			'INSERT INTO COVID19_sp20.States'
-            + '(StateName, Population, FIPS, FirstCase, FirstDeath) VALUES'
-            + '(?, ?, ?, ?, ?)',
-			stateValues,
-			(error, results) => {
-				// send appropriate response
-				if (error) {
-					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
-				} else {
-					resolve(results);
-				}
-			},
-		);
 	});
 };
 
