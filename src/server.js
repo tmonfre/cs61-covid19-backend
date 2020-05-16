@@ -14,8 +14,6 @@ import initializeScheduler from './services/schedule-update';
 
 // import createInitialAdminUser from './constants/initial-user';
 
-import { resetCaseCounts } from './services/populate-db';
-
 require('dotenv').config();
 
 // initialize server
@@ -80,11 +78,3 @@ initializeScheduler();
 // uncomment the below function call to create
 // an initial admin user in the system to log in as
 // createInitialAdminUser(app);
-
-resetCaseCounts()
-	.then((data) => {
-		console.log(data);
-	})
-	.catch((error) => {
-		console.log(error);
-	});
