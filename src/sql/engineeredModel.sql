@@ -85,22 +85,19 @@ CREATE TABLE IF NOT EXISTS `COVID19_sp20`.`CaseCount` (
 -- -----------------------------------------------------
 -- Table `COVID19_sp20`.`Audit`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `COVID19_sp20`.`Audit`;
+
 CREATE TABLE IF NOT EXISTS `COVID19_sp20`.`Audit` (
   `AuditID` INT NOT NULL AUTO_INCREMENT,
-  `UserName` VARCHAR(45) NOT NULL,
   `Date` DATETIME NOT NULL,
-  `TableName` VARCHAR(45) NOT NULL,
-  `AttributeName` VARCHAR(45) NOT NULL,
-  `ValBefore` VARCHAR(100) NULL,
-  `ValAfter` VARCHAR(100) NULL,
+  `CountyID` INT NOT NULL,
+  `StateName` VARCHAR(100) NOT NULL,
+  `CaseCountBefore` VARCHAR(100) NULL,
+  `CaseCountAfter` VARCHAR(100) NULL,
+  `DeathCountBefore` VARCHAR(100) NULL,
+  `DeathCountAfter` VARCHAR(100) NULL,
   PRIMARY KEY (`AuditID`),
-  UNIQUE INDEX `AuditID_UNIQUE` (`AuditID` ASC),
-  INDEX `fk_Audit_Users1_idx` (`UserName` ASC),
-  CONSTRAINT `fk_Audit_Users1`
-    FOREIGN KEY (`UserName`)
-    REFERENCES `COVID19_sp20`.`Users` (`UserName`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+  UNIQUE INDEX `AuditID_UNIQUE` (`AuditID` ASC));
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
