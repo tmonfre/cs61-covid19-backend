@@ -3,7 +3,9 @@
 import { getStateIdentifyingInformation, getCountyIdentifyingInformation, getNYTCountyData } from './data-requests';
 import { createState, getAllStates } from '../controllers/state-controller';
 import { createCounty, getAllCounties } from '../controllers/county-controller';
-import { deleteAllCaseCounts, createCaseCount } from '../controllers/case-count-controller';
+import {
+	deleteAllCaseCounts, createCaseCount,
+} from '../controllers/case-count-controller';
 
 const createStates = () => {
 	return new Promise((resolve, reject) => {
@@ -262,115 +264,204 @@ const resetCaseCounts = () => {
 	});
 };
 
-const setNewCaseCounts = () => {
-	// just add new day
-	return new Promise((resolve, reject) => {
-		getAllCounties()
-			.then((dbCounties) => {
-				getNYTCountyData()
-					.then((nytData) => {
-						console.log('got the NYT covid19 data');
+// const setNewCaseCounts = () => {
+// 	// just add new day
+// 	return new Promise((resolve, reject) => {
+// 		getAllCaseCountsWithCountyName()
+// 			.then((caseCounts) => {
+// 				getCountyStateCaseCountAll()
+// 					.then((dbRunningSumData) => {
+// 						console.log('got the case count data');
 
-						const promises = [];
-						const mostRecentNYTDate = {};
+// 						const mostRecentDate = {};
 
-						// set the most recent date we have available for every county
-						nytData.forEach((county) => {
-							// create state if doesn't exist
-							if (!mostRecentNYTDate[county.state]) {
-								mostRecentNYTDate[county.state] = {};
-							}
+// 						// set the most recent date we have available for every county
+// 						caseCounts.forEach((caseCount) => {
+// 							// create state if doesn't exist
+// 							if (!mostRecentDate[caseCount.StateName]) {
+// 								mostRecentDate[caseCount.StateName] = {};
+// 							}
 
-							// create county if doesn't exist
-							if (!mostRecentNYTDate[county.state][county.county]) {
-								mostRecentNYTDate[county.state][county.county] = {
-									mostRecent: {},
-									secondMostRecent: {},
-								};
-							}
+// 							// create county if doesn't exist
+// 							if (!mostRecentDate[caseCount.StateName][caseCount.CountyName]) {
+// 								mostRecentDate[caseCount.StateName][caseCount.CountyName] = {};
+// 							}
 
-							// set new recent date if didn't find
-							if (Object.keys(mostRecentNYTDate[county.state][county.county].mostRecent).length === 0 || mostRecentNYTDate[county.state][county.county].mostRecent.date < county.date) {
-								mostRecentNYTDate[county.state][county.county].secondMostRecent = mostRecentNYTDate[county.state][county.county].mostRecent;
-								mostRecentNYTDate[county.state][county.county].mostRecent = county;
-							}
-						});
+// 							// set new recent date if didn't find
+// 							if (Object.keys(mostRecentDate[caseCount.StateName][caseCount.CountyName]).length === 0 || new Date(mostRecentDate[caseCount.StateName][caseCount.CountyName].Date) < new Date(caseCount.Date)) {
+// 								mostRecentDate[caseCount.StateName][caseCount.CountyName] = caseCount;
+// 							}
+// 						});
 
-						Object.keys(mostRecentNYTDate).forEach((state) => {
-							Object.keys(mostRecentNYTDate[state]).forEach(((county) => {
-								promises.push(new Promise((res, rej) => {
-									const countyDBObj = dbCounties.find((c) => { return c.StateName === state && c.CountyName === county; });
+// 						console.log('set the most recent date');
 
-									if (countyDBObj !== undefined) {
-										// generate case count
-										createCaseCount({
-											CountyID: countyDBObj.CountyID,
-											StateName: state,
-											Date: new Date(mostRecentNYTDate[state][county].mostRecent.date).toISOString().split('T')[0],
-											CaseCount: mostRecentNYTDate[state][county].mostRecent.cases - (mostRecentNYTDate[state][county].secondMostRecent.cases || 0),
-											DeathCount: mostRecentNYTDate[state][county].mostRecent.deaths - (mostRecentNYTDate[state][county].secondMostRecent.deaths || 0),
-										})
-											.then((data) => {
-												console.log(`Successfully set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
-												res(data);
-											})
-											.catch((err) => {
-												console.log(`Failed to set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
-												rej(err);
-											});
-									} else {
-										createCounty({
-											CountyName: county,
-											StateName: state,
-											Population: 0,
-										})
-											.then((createdCounty) => {
-											// generate case count
-												createCaseCount({
-													CountyID: createdCounty.CountyID,
-													StateName: state,
-													Date: new Date(mostRecentNYTDate[state][county].mostRecent.date).toISOString().split('T')[0],
-													CaseCount: mostRecentNYTDate[state][county].mostRecent.cases - (mostRecentNYTDate[state][county].secondMostRecent.cases || 0),
-													DeathCount: mostRecentNYTDate[state][county].mostRecent.deaths - (mostRecentNYTDate[state][county].secondMostRecent.deaths || 0),
-												})
-													.then((data) => {
-														console.log(`Successfully set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
-														res(data);
-													})
-													.catch((err) => {
-														console.log(`Failed to set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
-														rej(err);
-													});
-											})
-											.catch((err) => {
-												res();
-											});
-									}
-								}));
-							}));
-						});
+// 						getNYTCountyData()
+// 							.then((nytData) => {
+// 								const promises = [];
 
-						Promise.all(promises)
-							.then(() => {
-								resolve('Successfully set new case count data');
-							})
-							.catch((error) => {
-								reject(error);
-							});
-					})
-					.catch((error) => {
-						reject(error);
-					});
-			})
-			.catch((error) => {
-				reject(error);
-			});
-	});
-};
+// 								nytData.forEach((nytDataInstance) => {
+// 									const dbObject = mostRecentDate[nytDataInstance.state][nytDataInstance.county];
+// 									const runningSumObj = dbRunningSumData.find((obj) => { return obj.CountyID === dbObject.CountyID && obj.StateName === dbObject.StateName; });
+
+// 									if (dbObject !== undefined && new Date(dbObject.Date) < new Date(nytDataInstance.date)) {
+// 										promises.push(new Promise((res, rej) => {
+// 											createCaseCount({
+// 												CountyID: dbObject.CountyID,
+// 												StateName: dbObject.StateName,
+// 												Date: new Date(nytDataInstance.date).toISOString().split('T')[0],
+// 												CaseCount: parseInt(nytDataInstance.cases) - (runningSumObj.CaseCountSum || 0),
+// 												DeathCount: parseInt(nytDataInstance.deaths) - (runningSumObj.DeathCountSum || 0),
+// 											})
+// 												.then((data) => {
+// 													console.log(`Successfully set case count for state: ${dbObject.StateName}, county: ${dbObject.CountyName}, date: ${mostRecentDate[dbObject.StateName][dbObject.CountyName].Date}`);
+// 													res(data);
+// 												})
+// 												.catch((err) => {
+// 													console.log(`Failed to set case count for state: ${dbObject.StateName}, county: ${dbObject.CountyName}, date: ${mostRecentDate[dbObject.StateName][dbObject.CountyName].Date}`);
+// 													rej(err);
+// 												});
+
+// 											mostRecentDate[nytDataInstance.state][nytDataInstance.county] = {
+// 												...dbObject,
+// 												CaseCount: nytDataInstance.cases,
+// 												DeathCount: nytDataInstance.deaths,
+// 												Date: nytDataInstance.date,
+// 											dbRunningSumData.find((obj) => { return obj.CountyID === dbObject.CountyID && obj.StateName === dbObject.StateName; }).CaseCountSum = parseInt(nytDataInstance.cases);
+// 											dbRunningSumData.find((obj) => { return obj.CountyID === dbObject.CountyID && obj.StateName === dbObject.StateName; }).DeathCountSum = parseInt(nytDataInstance.deaths);
+// 										}));
+// 									}
+// 								});
+
+// 								Promise.all(promises)
+// 									.then(() => {
+// 										resolve('Successfully set new case count data');
+// 									})
+// 									.catch((error) => {
+// 										reject(error);
+// 									});
+// 							})
+// 							.catch((error) => {
+// 								reject(error);
+// 							});
+// 					})
+// 					.catch((error) => {
+// 						reject(error);
+// 					});
+// 			})
+// 			.catch((error) => {
+// 				reject(error);
+// 			});
+// 	});
+// };
+
+// const setNewCaseCounts = () => {
+// 	// just add new day
+// 	return new Promise((resolve, reject) => {
+// 		getAllCounties()
+// 			.then((dbCounties) => {
+// 				getNYTCountyData()
+// 					.then((nytData) => {
+// 						console.log('got the NYT covid19 data');
+
+// 						const promises = [];
+// 						const mostRecentNYTDate = {};
+
+// 						// set the most recent date we have available for every county
+// 						nytData.forEach((county) => {
+// 							// create state if doesn't exist
+// 							if (!mostRecentNYTDate[county.state]) {
+// 								mostRecentNYTDate[county.state] = {};
+// 							}
+
+// 							// create county if doesn't exist
+// 							if (!mostRecentNYTDate[county.state][county.county]) {
+// 								mostRecentNYTDate[county.state][county.county] = {
+// 									mostRecent: {},
+// 									secondMostRecent: {},
+// 								};
+// 							}
+
+// 							// set new recent date if didn't find
+// 							if (Object.keys(mostRecentNYTDate[county.state][county.county].mostRecent).length === 0 || mostRecentNYTDate[county.state][county.county].mostRecent.date < county.date) {
+// 								mostRecentNYTDate[county.state][county.county].secondMostRecent = mostRecentNYTDate[county.state][county.county].mostRecent;
+// 								mostRecentNYTDate[county.state][county.county].mostRecent = county;
+// 							}
+// 						});
+
+// 						Object.keys(mostRecentNYTDate).forEach((state) => {
+// 							Object.keys(mostRecentNYTDate[state]).forEach(((county) => {
+// 								promises.push(new Promise((res, rej) => {
+// 									const countyDBObj = dbCounties.find((c) => { return c.StateName === state && c.CountyName === county; });
+
+// 									if (countyDBObj !== undefined) {
+// 										// generate case count
+// 										createCaseCount({
+// 											CountyID: countyDBObj.CountyID,
+// 											StateName: state,
+// 											Date: new Date(mostRecentNYTDate[state][county].mostRecent.date).toISOString().split('T')[0],
+// 											CaseCount: mostRecentNYTDate[state][county].mostRecent.cases - (mostRecentNYTDate[state][county].secondMostRecent.cases || 0),
+// 											DeathCount: mostRecentNYTDate[state][county].mostRecent.deaths - (mostRecentNYTDate[state][county].secondMostRecent.deaths || 0),
+// 										})
+// 											.then((data) => {
+// 												console.log(`Successfully set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
+// 												res(data);
+// 											})
+// 											.catch((err) => {
+// 												console.log(`Failed to set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
+// 												rej(err);
+// 											});
+// 									} else {
+// 										createCounty({
+// 											CountyName: county,
+// 											StateName: state,
+// 											Population: 0,
+// 										})
+// 											.then((createdCounty) => {
+// 											// generate case count
+// 												createCaseCount({
+// 													CountyID: createdCounty.CountyID,
+// 													StateName: state,
+// 													Date: new Date(mostRecentNYTDate[state][county].mostRecent.date).toISOString().split('T')[0],
+// 													CaseCount: mostRecentNYTDate[state][county].mostRecent.cases - (mostRecentNYTDate[state][county].secondMostRecent.cases || 0),
+// 													DeathCount: mostRecentNYTDate[state][county].mostRecent.deaths - (mostRecentNYTDate[state][county].secondMostRecent.deaths || 0),
+// 												})
+// 													.then((data) => {
+// 														console.log(`Successfully set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
+// 														res(data);
+// 													})
+// 													.catch((err) => {
+// 														console.log(`Failed to set case count for state: ${state}, county: ${county}, date: ${mostRecentNYTDate[state][county].mostRecent.date}`);
+// 														rej(err);
+// 													});
+// 											})
+// 											.catch((err) => {
+// 												res();
+// 											});
+// 									}
+// 								}));
+// 							}));
+// 						});
+
+// 						Promise.all(promises)
+// 							.then(() => {
+// 								resolve('Successfully set new case count data');
+// 							})
+// 							.catch((error) => {
+// 								reject(error);
+// 							});
+// 					})
+// 					.catch((error) => {
+// 						reject(error);
+// 					});
+// 			})
+// 			.catch((error) => {
+// 				reject(error);
+// 			});
+// 	});
+// };
 
 export {
 	createStates,
 	createCounties,
 	resetCaseCounts,
-	setNewCaseCounts,
 };

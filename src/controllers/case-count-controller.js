@@ -28,6 +28,25 @@ const getAllCaseCountsWithCountyName = () => {
 	});
 };
 
+const getCountyStateCaseCountAll = () => {
+	return new Promise((resolve, reject) => {
+		// get user
+		global.connection.query(
+			'SELECT CountyID, StateName, SUM(CaseCount) AS CaseCountSum, SUM(DeathCount) AS DeathCountSum FROM CaseCount GROUP BY StateName, CountyID',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+
 // get a specific case count by countyID in the database
 const getCountyCaseCount = (countyID) => {
 	return new Promise((resolve, reject) => {
@@ -212,6 +231,7 @@ const deleteAllCaseCounts = () => {
 export {
 	getAllCaseCounts,
 	getAllCaseCountsWithCountyName,
+	getCountyStateCaseCountAll,
 	getCountyCaseCount,
 	getStateCaseCount,
 	deleteCaseCount,
