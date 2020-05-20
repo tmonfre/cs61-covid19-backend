@@ -10,11 +10,6 @@ import stateRouter from './routers/state-router';
 import countyRouter from './routers/county-router';
 
 import requireAuth from './authentication/require-auth';
-import initializeScheduler from './services/schedule-update';
-
-// import createInitialAdminUser from './constants/initial-user';
-
-import { resetCaseCounts } from './services/populate-db';
 
 require('dotenv').config();
 
@@ -72,19 +67,3 @@ app.use('/api/counties', countyRouter);
 app.listen(process.env.PORT, () => {
 	console.log(`Listening on port ${process.env.PORT}`);
 });
-
-// set the database to update case counts every day
-initializeScheduler();
-
-// NOTE FOR GRADERS:
-// uncomment the below function call to create
-// an initial admin user in the system to log in as
-// createInitialAdminUser(app);
-
-resetCaseCounts()
-	.then((data) => {
-		console.log(data);
-	})
-	.catch((error) => {
-		console.log(error);
-	});
