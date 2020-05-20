@@ -22,11 +22,11 @@ const createInitialAdminUser = (app) => {
 
 	// make request
 	axios.post('http://localhost:3000/initial-admin', {
-		FirstName: 'Thomas',
-		LastName: 'Monfre',
+		FirstName: 'Emma',
+		LastName: 'Rafkin',
 		AccountCreated: new Date().toISOString().split('T')[0],
-		UserName: 'tmonfre',
-		Password: 'password',
+		UserName: 'erafkin',
+		Password: 'test',
 		AdminUser: true,
 	})
 		.then((result) => {
