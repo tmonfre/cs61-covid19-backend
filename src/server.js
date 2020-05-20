@@ -8,6 +8,8 @@ import userRouter from './routers/user-router';
 import authRouter from './routers/auth-router';
 import stateRouter from './routers/state-router';
 import countyRouter from './routers/county-router';
+import caseCountRouter from './routers/case-count-router';
+
 
 import requireAuth from './authentication/require-auth';
 
@@ -62,6 +64,8 @@ app.use('/api/users', requireAuth, userRouter);
 app.use('/api/authentication', authRouter);
 app.use('/api/states', stateRouter);
 app.use('/api/counties', countyRouter);
+app.use('/api/counts', caseCountRouter);
+
 
 // start listening
 app.listen(process.env.PORT, () => {

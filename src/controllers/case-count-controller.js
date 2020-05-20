@@ -68,6 +68,43 @@ const getCountyCaseCount = (countyID) => {
 	});
 };
 
+const getAllStateCountsOverTime = () => {
+	return new Promise((resolve, reject) => {
+		// get user
+		global.connection.query(
+			'SELECT Date, StateName, SUM(CaseCount) AS CaseCountSum, SUM(DeathCount) AS DeathCountSum FROM CaseCount GROUP BY StateName, Date ORDER BY Date ASC',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+const getAllCountsOverTime = () => {
+	return new Promise((resolve, reject) => {
+		// get user
+		global.connection.query(
+			'SELECT Date, SUM(CaseCount) AS CaseCountSum, SUM(DeathCount) AS DeathCountSum FROM CaseCount GROUP BY  Date ORDER BY Date ASC',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+
 // get case count for a specific state
 const getStateCaseCount = (StateName) => {
 	return new Promise((resolve, reject) => {
@@ -238,4 +275,6 @@ export {
 	updateCaseCount,
 	createCaseCount,
 	deleteAllCaseCounts,
+	getAllStateCountsOverTime,
+	getAllCountsOverTime,
 };

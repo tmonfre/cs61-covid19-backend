@@ -81,5 +81,37 @@ router.route('/states/:statename')
 				});
 			});
 	});
+router.route('/states/')
+	// GET sum of stat counts
+	.get((req, res) => {
+		// grab the data
+		caseCountController.getAllStateCountsOverTime()
+			.then((response) => {
+				res.send({ status: 200, error: null, response });
+			})
+			.catch((error) => {
+				res.status(error.code.status).send({
+					status: error.code.status,
+					error: error.error,
+					response: error.code.message,
+				});
+			});
+	});
+router.route('/country/')
+	// GET sum of stat counts
+	.get((req, res) => {
+		// grab the data
+		caseCountController.getAllCountsOverTime()
+			.then((response) => {
+				res.send({ status: 200, error: null, response });
+			})
+			.catch((error) => {
+				res.status(error.code.status).send({
+					status: error.code.status,
+					error: error.error,
+					response: error.code.message,
+				});
+			});
+	});
 
 export default router;
