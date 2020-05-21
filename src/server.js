@@ -10,7 +10,6 @@ import stateRouter from './routers/state-router';
 import countyRouter from './routers/county-router';
 import caseCountRouter from './routers/case-count-router';
 
-
 import requireAuth from './authentication/require-auth';
 
 require('dotenv').config();
@@ -70,4 +69,5 @@ app.use('/api/counts', caseCountRouter);
 // start listening
 app.listen(process.env.PORT, () => {
 	console.log(`Listening on port ${process.env.PORT}`);
+	// getCountyStateCaseCountAll();
 });
