@@ -106,7 +106,7 @@ const getCountyCaseCount = (countyID) => {
 	return new Promise((resolve, reject) => {
 		// get user
 		global.connection.query(
-			'SELECT * FROM COVID19_sp20.CaseCount WHERE CountyID = ?',
+			'SELECT Date, SUM(CaseCount) AS CaseCountSum, SUM(DeathCount) AS DeathCountSum FROM CaseCount WHERE CountyID = ? GROUP BY Date ORDER BY Date ASC',
 			[countyID],
 			(error, results, fields) => {
 				// send appropriate response
@@ -115,7 +115,7 @@ const getCountyCaseCount = (countyID) => {
 				} else if (results.length === 0) {
 					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
 				} else {
-					resolve(results[0]);
+					resolve(results);
 				}
 			},
 		);
