@@ -38,6 +38,17 @@ app.use((req, res, next) => {
 	next();
 });
 
+// create database connection
+app.use((req, res, next) => {
+	global.connection = mysql.createConnection({
+		host: process.env.HOST,
+		user: process.env.USERNAME,
+		password: process.env.PASSWORD,
+		database: process.env.SCHEMA,
+	});
+	global.connection.connect();
+	next();
+});
 
 // create global database connection
 global.connection = mysql.createConnection({
