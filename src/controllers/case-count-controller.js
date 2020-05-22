@@ -28,6 +28,7 @@ const getAllCaseCountsWithCountyName = () => {
 	});
 };
 
+// get the total case and death counts for each county
 const getCountyStateCaseCountAll = () => {
 	return new Promise((resolve, reject) => {
 		// get user
@@ -40,7 +41,60 @@ const getCountyStateCaseCountAll = () => {
 				} else if (results.length === 0) {
 					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
 				} else {
+					// console.log(results);
 					resolve(results);
+				}
+			},
+		);
+	});
+};
+
+// get the total case and death counts for each county with county name
+const getCountyCaseCountAll = () => {
+	return new Promise((resolve, reject) => {
+		// get user
+		global.connection.query(
+			'SELECT a.CountyID, a.StateName, b.CountyName, SUM(a.CaseCount) AS CaseCountSum, SUM(a.DeathCount) AS DeathCountSum FROM CaseCount a JOIN Counties b ON a.CountyID=b.CountyID GROUP BY a.StateName, a.CountyID',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					console.log(error);
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					resolve(results);
+				}
+			},
+		);
+	});
+};
+
+// get the total case and death counts for each state
+const getStateCaseCountAll = () => {
+	return new Promise((resolve, reject) => {
+		// get user
+		global.connection.query(
+			'SELECT CountyID, StateName, SUM(CaseCount) AS CaseCountSum, SUM(DeathCount) AS DeathCountSum FROM CaseCount GROUP BY StateName, CountyID',
+			(error, results, fields) => {
+				// send appropriate response
+				if (error) {
+					reject({ code: RESPONSE_CODES.INTERNAL_ERROR, error });
+				} else if (results.length === 0) {
+					reject({ code: RESPONSE_CODES.NOT_FOUND, error: { message: RESPONSE_CODES.NOT_FOUND.message } });
+				} else {
+					const newResults = {};
+					results.forEach((county) => {
+						if (!newResults[county.StateName]) {
+							newResults[county.StateName] = {
+								caseCountSum: 0,
+								deathCountSum: 0,
+							};
+						}
+						newResults[county.StateName].caseCountSum += county.CaseCountSum;
+						newResults[county.StateName].deathCountSum += county.DeathCountSum;
+					});
+					resolve(newResults);
 				}
 			},
 		);
@@ -277,4 +331,6 @@ export {
 	deleteAllCaseCounts,
 	getAllStateCountsOverTime,
 	getAllCountsOverTime,
+	getCountyCaseCountAll,
+	getStateCaseCountAll,
 };

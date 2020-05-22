@@ -114,4 +114,36 @@ router.route('/country/')
 			});
 	});
 
+router.route('/county/data/')
+	.get((req, res) => {
+		// grab the data
+		caseCountController.getCountyCaseCountAll()
+			.then((response) => {
+				res.send({ status: 200, error: null, response });
+			})
+			.catch((error) => {
+				res.status(error.code.status).send({
+					status: error.code.status,
+					error: error.error,
+					response: error.code.message,
+				});
+			});
+	});
+
+router.route('/state/data/')
+	.get((req, res) => {
+		// grab the data
+		caseCountController.getStateCaseCountAll()
+			.then((response) => {
+				res.send({ status: 200, error: null, response });
+			})
+			.catch((error) => {
+				res.status(error.code.status).send({
+					status: error.code.status,
+					error: error.error,
+					response: error.code.message,
+				});
+			});
+	});
+
 export default router;
