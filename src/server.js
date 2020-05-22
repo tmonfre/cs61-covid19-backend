@@ -10,7 +10,6 @@ import stateRouter from './routers/state-router';
 import countyRouter from './routers/county-router';
 import caseCountRouter from './routers/case-count-router';
 
-
 import requireAuth from './authentication/require-auth';
 
 require('dotenv').config();
