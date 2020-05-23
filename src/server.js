@@ -65,7 +65,6 @@ app.use('/api/states', stateRouter);
 app.use('/api/counties', countyRouter);
 app.use('/api/counts', caseCountRouter);
 
-
 // start listening
 app.listen(process.env.PORT, () => {
 	console.log(`Listening on port ${process.env.PORT}`);

@@ -70,6 +70,7 @@ router.route('/:id')
 					res.send({ status: 200, error: null, response });
 				})
 				.catch((error) => {
+					console.log(error);
 					res.status(error.code.status).send({
 						status: error.code.status,
 						error: error.error,
