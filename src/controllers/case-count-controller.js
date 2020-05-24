@@ -194,7 +194,7 @@ const createCaseCount = (fields) => {
 		const stateValues = [
 			fields.CountyID,
 			fields.StateName,
-			fields.Date ? new Date(fields.Date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+			fields.Date ? new Date(fields.Date).toISOString().split('T')[0] : new Date(Date.now()).toISOString().split('T')[0],
 			fields.CaseCount || 0,
 			fields.DeathCount || 0,
 		];
@@ -284,7 +284,7 @@ const deleteCaseCount = (countyID, date) => {
 
 		// delete case count based on county id and date
 		global.connection.query(
-			'DELETE FROM COVID19_sp20.CaseCount WHERE countyID = ? AND Date = ?',
+			'DELETE FROM COVID19_sp20.CaseCount WHERE CountyID = ? AND Date = ?',
 			[countyID, date],
 			(error, results, fields) => {
 				// send appropriate response
