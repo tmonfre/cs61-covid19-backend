@@ -9,9 +9,9 @@ CREATE TRIGGER AuditTriggerCreate
     FOR EACH ROW
     BEGIN
 		INSERT INTO Audit 
-		(UserName, Date, CountyID, StateName, CaseCountBefore, CaseCountAfter, DeathCountBefore, DeathCountAfter) 
+		(Date, CountyID, StateName, CaseCountBefore, CaseCountAfter, DeathCountBefore, DeathCountAfter) 
 		VALUES 
-		(CURRENT_USER(), CURDATE(), NEW.CountyID, NEW.StateName, NULL, NEW.CaseCount, NULL, NEW.DeathCount);
+		(CURDATE(), NEW.CountyID, NEW.StateName, NULL, NEW.CaseCount, NULL, NEW.DeathCount);
     END$$
 DELIMITER ;
 
@@ -21,9 +21,9 @@ CREATE TRIGGER AuditTriggerUpdate
     FOR EACH ROW
     BEGIN
 		INSERT INTO Audit 
-		(UserName, Date, CountyID, StateName, CaseCountBefore, CaseCountAfter, DeathCountBefore, DeathCountAfter) 
+		(Date, CountyID, StateName, CaseCountBefore, CaseCountAfter, DeathCountBefore, DeathCountAfter) 
 		VALUES 
-		(CURRENT_USER(), CURDATE(), NEW.CountyID, NEW.StateName, OLD.CaseCount, NEW.CaseCount, OLD.DeathCount, NEW.DeathCount);
+		(CURDATE(), NEW.CountyID, NEW.StateName, OLD.CaseCount, NEW.CaseCount, OLD.DeathCount, NEW.DeathCount);
     END$$
 DELIMITER ;
     
